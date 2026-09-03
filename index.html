@@ -1,39 +1,562 @@
 <!DOCTYPE html>
-
 <html lang="th">
-
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>HC Ordering Calculator</title>
 
   <style>
-
     * {
-
       box-sizing: border-box;
-
     }
 
     body {
-
       margin: 0;
-
       font-family: Arial, sans-serif;
-
       background: #f4f7fb;
-
       color: #1f2937;
-
     }
 
     .container {
-
       max-width: 900px;
-
       margin: 0 auto;
+      padding: 25px 15px 50px;
+    }
 
-      padding: 25px 15px 50px
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      color: #1d4ed8;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: end;
+    }
+
+    @media (max-width: 700px) {
+      .item-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .remove-btn {
+        width: 100%;
+      }
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 13px 18px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .primary-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .primary-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .add-btn {
+      background: #e0e7ff;
+      color: #1d4ed8;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .remove-btn {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .summary {
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #dbeafe;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .total {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1d4ed8;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .reset-btn {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .footer {
+      text-align: center;
+      color: #9ca3af;
+      margin-top: 30px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <header>
+      <h1>HC Ordering Calculator</h1>
+      <p class="subtitle">
+        เครื่องคำนวณยอดสั่งซื้อ
+      </p>
+    </header>
+
+    <div class="card">
+
+      <h2>รายการสินค้า</h2>
+
+      <div id="items">
+
+        <div class="item-row">
+
+          <div>
+            <label>สินค้า</label>
+            <input
+              type="text"
+              class="item-name"
+              placeholder="ชื่อสินค้า">
+          </div>
+
+          <div>
+            <label>ราคา/ชิ้น</label>
+            <input
+              type="number"
+              class="price"
+              value="0"
+              min="0"
+              oninput="calculate()">
+          </div>
+
+          <div>
+            <label>จำนวน</label>
+            <input
+              type="number"
+              class="quantity"
+              value="1"
+              min="1"
+              oninput="calculate()">
+          </div>
+
+          <button
+            class="remove-btn"
+            onclick="removeItem(this)">
+            ลบ
+          </button>
+
+        </div>
+
+      </div>
+
+      <button
+        class="add-btn"
+        onclick="addItem()">
+        + เพิ่มสินค้า
+      </button>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>ค่าใช้จ่ายเพิ่มเติม</h2>
+
+      <div class="grid">
+
+        <div>
+          <label>ค่าจัดส่ง</label>
+          <input
+            type="number"
+            id="shipping"
+            value="0"
+            min="0"
+            oninput="calculate()">
+        </div>
+
+        <div>
+          <label>ส่วนลด</label>
+          <input
+            type="number"
+            id="discount"
+            value="0"
+            min="0"
+            oninput="calculate()">
+        </div>
+
+        <div>
+          <label>VAT (%)</label>
+          <input
+            type="number"
+            id="vat"
+            value="0"
+            min="0"
+            oninput="calculate()">
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="card summary">
+
+      <h2>สรุปยอดสั่งซื้อ</h2>
+
+      <div class="summary-row">
+        <span>ยอดรวมสินค้า</span>
+        <strong id="subtotal">฿0.00</strong>
+      </div>
+
+      <div class="summary-row">
+        <span>ค่าจัดส่ง</span>
+        <strong id="shippingTotal">฿0.00</strong>
+      </div>
+
+      <div class="summary-row">
+        <span>ส่วนลด</span>
+        <strong id="discountTotal">- ฿0.00</strong>
+      </div>
+
+      <div class="summary-row">
+        <span>VAT</span>
+        <strong id="vatTotal">฿0.00</strong>
+      </div>
+
+      <div class="summary-row total">
+        <span>ยอดสุทธิ</span>
+        <span id="grandTotal">฿0.00</span>
+      </div>
+
+      <div class="actions">
+
+        <button
+          class="primary-btn"
+          onclick="calculate()">
+          คำนวณยอด
+        </button>
+
+        <button
+          class="reset-btn"
+          onclick="resetCalculator()">
+          เริ่มใหม่
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="footer">
+      HC Ordering Calculator
+    </div>
+
+  </div>
+
+
+  <script>
+
+    function addItem() {
+
+      const items = document.getElementById("items");
+
+      const row = document.createElement("div");
+
+      row.className = "item-row";
+
+      row.innerHTML = `
+
+        <div>
+          <label>สินค้า</label>
+          <input
+            type="text"
+            class="item-name"
+            placeholder="ชื่อสินค้า">
+        </div>
+
+        <div>
+          <label>ราคา/ชิ้น</label>
+          <input
+            type="number"
+            class="price"
+            value="0"
+            min="0"
+            oninput="calculate()">
+        </div>
+
+        <div>
+          <label>จำนวน</label>
+          <input
+            type="number"
+            class="quantity"
+            value="1"
+            min="1"
+            oninput="calculate()">
+        </div>
+
+        <button
+          class="remove-btn"
+          onclick="removeItem(this)">
+          ลบ
+        </button>
+
+      `;
+
+      items.appendChild(row);
+
+    }
+
+
+    function removeItem(button) {
+
+      const rows = document.querySelectorAll(".item-row");
+
+      if (rows.length > 1) {
+        button.parentElement.remove();
+        calculate();
+      } else {
+        alert("ต้องมีสินค้าอย่างน้อย 1 รายการ");
+      }
+
+    }
+
+
+    function calculate() {
+
+      let subtotal = 0;
+
+      const prices =
+        document.querySelectorAll(".price");
+
+      const quantities =
+        document.querySelectorAll(".quantity");
+
+
+      for (let i = 0; i < prices.length; i++) {
+
+        const price =
+          parseFloat(prices[i].value) || 0;
+
+        const quantity =
+          parseFloat(quantities[i].value) || 0;
+
+        subtotal += price * quantity;
+
+      }
+
+
+      const shipping =
+        parseFloat(
+          document.getElementById("shipping").value
+        ) || 0;
+
+
+      const discount =
+        parseFloat(
+          document.getElementById("discount").value
+        ) || 0;
+
+
+      const vatPercent =
+        parseFloat(
+          document.getElementById("vat").value
+        ) || 0;
+
+
+      let beforeVat =
+        subtotal + shipping - discount;
+
+
+      if (beforeVat < 0) {
+        beforeVat = 0;
+      }
+
+
+      const vat =
+        beforeVat * vatPercent / 100;
+
+
+      const total =
+        beforeVat + vat;
+
+
+      document.getElementById("subtotal").textContent =
+        formatCurrency(subtotal);
+
+
+      document.getElementById("shippingTotal").textContent =
+        formatCurrency(shipping);
+
+
+      document.getElementById("discountTotal").textContent =
+        "- " + formatCurrency(discount);
+
+
+      document.getElementById("vatTotal").textContent =
+        formatCurrency(vat);
+
+
+      document.getElementById("grandTotal").textContent =
+        formatCurrency(total);
+
+    }
+
+
+    function formatCurrency(number) {
+
+      return new Intl.NumberFormat(
+        "th-TH",
+        {
+          style: "currency",
+          currency: "THB"
+        }
+      ).format(number);
+
+    }
+
+
+    function resetCalculator() {
+
+      document.getElementById("items").innerHTML = `
+
+        <div class="item-row">
+
+          <div>
+            <label>สินค้า</label>
+            <input
+              type="text"
+              class="item-name"
+              placeholder="ชื่อสินค้า">
+          </div>
+
+          <div>
+            <label>ราคา/ชิ้น</label>
+            <input
+              type="number"
+              class="price"
+              value="0"
+              min="0"
+              oninput="calculate()">
+          </div>
+
+          <div>
+            <label>จำนวน</label>
+            <input
+              type="number"
+              class="quantity"
+              value="1"
+              min="1"
+              oninput="calculate()">
+          </div>
+
+          <button
+            class="remove-btn"
+            onclick="removeItem(this)">
+            ลบ
+          </button>
+
+        </div>
+
+      `;
+
+
+      document.getElementById("shipping").value = 0;
+
+      document.getElementById("discount").value = 0;
+
+      document.getElementById("vat").value = 0;
+
+
+      calculate();
+
+    }
+
+
+    calculate();
+
+  </script>
+
+</body>
+</html>
